@@ -10,7 +10,7 @@ function pageLoad() {
         + '<th style="width:150px">Wednesday</th>'
         + '<th style="width:150px">Thursday</th>'
         + '<th style="width:150px">Friday</th>'
-        + '<th style="width:150px">Saturday</th>' 
+        + '<th style="width:150px">Saturday</th>'
         + '</tr>';
     //Creates the table that all the retrieved information will be put on
 
