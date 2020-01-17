@@ -1,0 +1,75 @@
+body {
+    background-color: navy;
+    margin: 0;
+    font-family: 'Arial', serif;
+}
+
+h1 {
+    margin-top:0;
+}
+
+table, th, td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+
+}
+
+#content {
+    background-color: white;
+    width: 1000px;
+    margin: 0 auto;
+    min-height: 600px;
+    padding: 32px;
+}
+.loginDiv {
+    font-size: 14pt;
+    margin-top: 40px;
+    margin-left: 20px;
+}
+
+#email {
+    margin-left: 65px;
+    font-size: 14pt;
+}
+
+#password {
+    margin-left: 30px;
+    font-size: 14px;
+}
+
+#loginButton {
+    width: 200px;
+    background-color: cornflowerblue;
+}
+
+#loginButton:hover {
+    background-color: dodgerblue;
+}
+
+.editButton, .deleteButton, #saveButton, #cancelButton, #loginButton {
+    color: black;
+    font-size: 14px;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.deleteButton, #cancelButton {
+    visibility: hidden;
+    background-color: indianred;
+    margin-left: 10px;
+}
+
+.editButton {
+    visibility: hidden;
+    background-color: silver;
+}
+
+
+#loggedInDetails {
+    margin: 0;
+    text-align: right;
+    display: inline;
+    float: right
+}
