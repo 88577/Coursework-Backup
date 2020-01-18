@@ -27,12 +27,17 @@
                 <span id="description"></span>
             </div>
             <div>
+                <span class="bookingDetails">Time: </span>
+                <span id="time"></span>
+            </div>
+            <div>
                 <form id="bookingForm">
-                    <input type="hidden" id="bookingType">
-                    <input type="hidden" id="bookingDescription">
-                    <input type="hidden" id="slots">
+                    <input type="hidden" name="bookingID" id="bookingID">
+                    <input type="hidden" name="bookingDay" id="bookingDay">
+                    <input type="hidden" name="bookingTime" id="bookingTime">
                 </form>
             </div>
+
             <input type="button" value="Book" id="bookButton">
         </div>
     </div>

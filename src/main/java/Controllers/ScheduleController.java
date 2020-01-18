@@ -15,10 +15,23 @@ import java.util.UUID;
 
 @Path("ScheduleController/")
 
+
 public class ScheduleController {
 
-        public static void InsertBookingTiming(int bookingID, String day, int time){
+        @POST
+        @Path("InsertBookingTiming")
+        @Consumes(MediaType.MULTIPART_FORM_DATA)
+        @Produces(MediaType.APPLICATION_JSON)
+        public static String InsertBookingTiming(
+                @FormDataParam("bookingID") Integer bookingID,
+                @FormDataParam("day") String day,
+                @FormDataParam("time") Integer time){
             try {
+                if(bookingID == null || day == null || time == null){
+                    // Check that no value is null
+                    throw new Exception("One or more form data parameters are missing from the HTTP request");
+                }
+                System.out.println("InsertBookingTiming");
                 boolean running = true;
                 PreparedStatement ps1 = Main.db.prepareStatement("INSERT INTO Schedule (bookingID, day, time) VALUES (?, ?, ?)");
                 ps1.setInt(1,bookingID);
@@ -46,9 +59,10 @@ public class ScheduleController {
                     System.out.println("Court conflict found");
                     System.out.println("Records not added");
                 }
-
+                return "{\"status\": \"OK\"}";
             }catch (Exception e){
                 System.out.println("Error " + e.getMessage());
+                return "{\"error\": \"Unable to create new item, please see server console for more info.\"}";
             }
         }
         public static void ListBookingTiming(int bookingID){

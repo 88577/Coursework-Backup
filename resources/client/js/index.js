@@ -49,12 +49,12 @@ function pageLoad() {
 
                 mySchedule += `<tr>` +
                     `<td>${i}:00</td>` +
-                    `<td style="background-color: ${bookingColourArray[0]}"><button class="scheduleButton" data-id="${bookingIDArray[0]}">${bookingArray[0]}</button></td>` +
-                    `<td style="background-color: ${bookingColourArray[1]}"><button class="scheduleButton" data-id="${bookingIDArray[1]}">${bookingArray[1]}</button></td>` +
-                    `<td style="background-color: ${bookingColourArray[2]}"><button class="scheduleButton" data-id="${bookingIDArray[2]}">${bookingArray[2]}</button></td>` +
-                    `<td style="background-color: ${bookingColourArray[3]}"><button class="scheduleButton" data-id="${bookingIDArray[3]}">${bookingArray[3]}</button></td>` +
-                    `<td style="background-color: ${bookingColourArray[4]}"><button class="scheduleButton" data-id="${bookingIDArray[4]}">${bookingArray[4]}</button></td>` +
-                    `<td style="background-color: ${bookingColourArray[5]}"><button class="scheduleButton" data-id="${bookingIDArray[5]}">${bookingArray[5]}</button></td>` +
+                    `<td style="background-color: ${bookingColourArray[0]}"><button class="scheduleButton" data-id="${bookingIDArray[0]}" time-id="${i}:00 - ${i+1}:00" day=j time=i>${bookingArray[0]}</button></td>` +
+                    `<td style="background-color: ${bookingColourArray[1]}"><button class="scheduleButton" data-id="${bookingIDArray[1]}" time-id="${i}:00 - ${i+1}:00">${bookingArray[1]}</button></td>` +
+                    `<td style="background-color: ${bookingColourArray[2]}"><button class="scheduleButton" data-id="${bookingIDArray[2]}" time-id="${i}:00 - ${i+1}:00">${bookingArray[2]}</button></td>` +
+                    `<td style="background-color: ${bookingColourArray[3]}"><button class="scheduleButton" data-id="${bookingIDArray[3]}" time-id="${i}:00 - ${i+1}:00">${bookingArray[3]}</button></td>` +
+                    `<td style="background-color: ${bookingColourArray[4]}"><button class="scheduleButton" data-id="${bookingIDArray[4]}" time-id="${i}:00 - ${i+1}:00">${bookingArray[4]}</button></td>` +
+                    `<td style="background-color: ${bookingColourArray[5]}"><button class="scheduleButton" data-id="${bookingIDArray[5]}" time-id="${i}:00 - ${i+1}:00">${bookingArray[5]}</button></td>` +
                     `</tr>`;
                 // Populates the table for a timing with each booking
             }
@@ -72,14 +72,23 @@ function pageLoad() {
 }
 
 function book(event){
+    document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
+    document.getElementById("bookButton").removeEventListener("click", bookBooking);
     let id = event.target.getAttribute("data-id");
+    let time = event.target.getAttribute("time-id");
+
+
+
     let btn = document.getElementById("bookButton");
+    document.getElementById("bookButton").setAttribute("time", event.target.getAttribute("time"));
+    document.getElementById("bookButton").setAttribute("day", event.target.getAttribute("day"));
     // Creates a variable for the specific bookingID
     if(id == -1){
         // If there is no bookingID
         document.getElementById("bookButton").addEventListener("click", bookNewBooking);
         document.getElementById("description").innerHTML = 'No Current Booking';
-        document.getElementById("bookDiv").style.display = 'block';
+        document.getElementById("time").innerHTML = time;
+        document.getElementById("bookingDiv").style.display = 'block';
 
 
     } else{
@@ -94,6 +103,7 @@ function book(event){
             } else{
                 document.getElementById("description").innerHTML = booking.description;
                 document.getElementById("bookingDiv").style.display = 'block';
+                document.getElementById("time").innerHTML = time;
                 btn.setAttribute("bookingID", id);
                 document.getElementById("bookButton").addEventListener("click", bookBooking);
             }
@@ -102,18 +112,27 @@ function book(event){
         // Prepares event handler for button
         }
 }
-function bookNewBooking(){
+function bookNewBooking(event){
     const userID = Cookies.get("userID");
     // Gets logged in user's id
-    let bookingID = -1;
-    console.log("booking...")
-    document.getElementById("bookingType").value = 3;
-    document.getElementById("bookingDescription").value = "Freeplay";
-    document.getElementById("slots").value = "";
+    let bookingID = 3;
+    console.log("booking...");
+    event.preventDefault();
+    document.getElementById("bookingID").value = 3;
+    document.getElementById("bookingDay").value = event.target.getAttribute("day");
+    document.getElementById("bookingTime").value = event.target.getAttribute("time");
     const form = document.getElementById("bookingForm");
     const formData = new FormData(form);
     console.log(formData);
-    fetch('/BookingsController/InsertUserBookings', {method: 'post', body: formData}
+    fetch('/ScheduleController/InsertBookingTiming', {method: 'post', body: formData}
+    ).then(response => response.json()
+    ).then(responseData => {
+        if (responseData.hasOwnProperty('error')) {
+            alert(responseData.error);
+        }
+    });
+
+    fetch('/BookingsController/InsertNewBooking', {method: 'post'}
     ).then(response => response.json()
     ).then(responseData => {
         if (responseData.hasOwnProperty('error')){
@@ -123,9 +142,12 @@ function bookNewBooking(){
         }
     });
 
+
+
     console.log("New Booking");
     console.log(userID + " " + bookingID);
     document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
+    document.getElementById("bookButton").removeEventListener("click", bookBooking);
 }
 function bookBooking() {
     let userID = Cookies.get("userID");
@@ -135,6 +157,7 @@ function bookBooking() {
     console.log("Existing Booking");
     console.log(userID + " " + bookingID);
     document.getElementById("bookButton").removeEventListener("click", bookBooking);
+    document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
 
 }
 

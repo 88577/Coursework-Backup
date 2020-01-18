@@ -43,11 +43,8 @@ public class BookingsController {
 
         @POST
         @Path("InsertNewBooking")
-        @Consumes(MediaType.MULTIPART_FORM_DATA)
         @Produces(MediaType.APPLICATION_JSON)
         public static String InsertNewBooking(
-                @FormDataParam("bookingType") Integer bookingType2,
-                @FormDataParam("description") String description2
         ){
         try{
             PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Bookings (bookingType, description) VALUES (?, ?)");
