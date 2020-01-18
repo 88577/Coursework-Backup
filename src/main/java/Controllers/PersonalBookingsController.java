@@ -5,6 +5,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import javax.print.attribute.standard.Media;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.awt.*;
@@ -94,6 +95,8 @@ public class PersonalBookingsController {
         }
 
     }
+
+
     public static void DeleteAllUsersBooking(int userID){
         try {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM personalBookings WHERE userID = ?");

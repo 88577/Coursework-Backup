@@ -72,15 +72,17 @@ function pageLoad() {
 }
 
 function book(event){
-    const id = event.target.getAttribute("data-id");
+    let id = event.target.getAttribute("data-id");
+    let btn = document.getElementById("bookButton");
     // Creates a variable for the specific bookingID
     if(id == -1){
         // If there is no bookingID
+        document.getElementById("bookButton").addEventListener("click", bookNewBooking);
         document.getElementById("description").innerHTML = 'No Current Booking';
         document.getElementById("bookDiv").style.display = 'block';
 
-    }
-    else{
+
+    } else{
         // If there is a bookingID
         fetch('/BookingsController/ListBookings/' + id, {method: 'get'}
         ).then(response => response.json()
@@ -92,14 +94,47 @@ function book(event){
             } else{
                 document.getElementById("description").innerHTML = booking.description;
                 document.getElementById("bookingDiv").style.display = 'block';
+                btn.setAttribute("bookingID", id);
+                document.getElementById("bookButton").addEventListener("click", bookBooking);
             }
         });
-        document.getElementById("bookButton").addEventListener("click", bookBooking);
-        // Prepares event handler for button
-    }
-}
 
+        // Prepares event handler for button
+        }
+}
+function bookNewBooking(){
+    const userID = Cookies.get("userID");
+    // Gets logged in user's id
+    let bookingID = -1;
+    console.log("booking...")
+    document.getElementById("bookingType").value = 3;
+    document.getElementById("bookingDescription").value = "Freeplay";
+    document.getElementById("slots").value = "";
+    const form = document.getElementById("bookingForm");
+    const formData = new FormData(form);
+    console.log(formData);
+    fetch('/BookingsController/InsertUserBookings', {method: 'post', body: formData}
+    ).then(response => response.json()
+    ).then(responseData => {
+        if (responseData.hasOwnProperty('error')){
+            alert(responseData.error);
+        } else {
+            alert("Booking made");
+        }
+    });
+
+    console.log("New Booking");
+    console.log(userID + " " + bookingID);
+    document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
+}
 function bookBooking() {
+    let userID = Cookies.get("userID");
+    // Gets logged in user's id
+    let bookingID = document.getElementById("bookButton").getAttribute("bookingID");
+    // Gets the bookingID
+    console.log("Existing Booking");
+    console.log(userID + " " + bookingID);
+    document.getElementById("bookButton").removeEventListener("click", bookBooking);
 
 }
 

@@ -41,6 +41,31 @@ public class BookingsController {
             }
         }
 
+        @POST
+        @Path("InsertNewBooking")
+        @Consumes(MediaType.MULTIPART_FORM_DATA)
+        @Produces(MediaType.APPLICATION_JSON)
+        public static String InsertNewBooking(
+                @FormDataParam("bookingType") Integer bookingType2,
+                @FormDataParam("description") String description2
+        ){
+        try{
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Bookings (bookingType, description) VALUES (?, ?)");
+
+            int bookingType = 3;
+            String description = "Freeplay";
+
+            ps.setInt(1, bookingType);
+            ps.setString(2, description);
+
+            ps.execute();
+            return "{\"status\": \"OK\"}";
+        }catch (Exception e){
+            System.out.println("Error" + e.getMessage());
+            return "{\"error\": \"Unable to create new item, please see server console for more info.\"}";
+        }
+    }
+
 
         public static void ListAllBookings(){
             try {
