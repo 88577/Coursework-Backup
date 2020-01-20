@@ -63,20 +63,28 @@ public class BookingsController {
         }
     }
 
-
-        public static void ListAllBookings(){
+        @GET
+        @Path("ListAllBookings")
+        @Produces(MediaType.APPLICATION_JSON)
+        public static String ListAllBookings(){
             try {
-                PreparedStatement ps = Main.db.prepareStatement("SELECT * FROM Bookings");
+                System.out.println("BookingsController/ListAllBookings");
+                JSONArray list = new JSONArray();
+
+                PreparedStatement ps = Main.db.prepareStatement("SELECT bookingID, bookingType, description, slots FROM Bookings");
                 ResultSet results = ps.executeQuery();
                 while (results.next()){
-                    int bookingID = results.getInt(1);
-                    int bookingType = results.getInt(2);
-                    String description = results.getString(3);
-                    int slots = results.getInt(4);
-                    System.out.println(bookingID + " " + bookingType + " " + description + " " + slots);
+                    JSONObject item = new JSONObject();
+                    item.put("bookingID", results.getInt(1));
+                    item.put("bookingType", results.getInt(2));
+                    item.put("description", results.getString(3));
+                    item.put("slots", results.getInt(4));
+                    list.add(item);
                 }
+                return list.toString();
             }catch (Exception e){
                 System.out.println("Error" + e.getMessage());
+                return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
             }
         }
 
@@ -98,7 +106,7 @@ public class BookingsController {
                     while (results.next()){
 
                         item.put("bookingsID", results.getInt(1));
-                        item.put("bookingTyoe", results.getInt(2));
+                        item.put("bookingType", results.getInt(2));
                         item.put("description", results.getString(3));
                         item.put("slots", results.getInt(4));
 

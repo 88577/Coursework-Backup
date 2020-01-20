@@ -12,13 +12,39 @@
 <body onload="pageLoad()">
 <div id="content">
     <div id="pageHeader">
-        <h1>Account Details</h1>
+        <div id="loggedInDetails">
+        </div>
+        <h1 id="header"></h1>
+
     </div>
 
 
     <div id="accountDIV">
-        <div id="loggedInDetails"></div>
+        <h3>Account Details</h3>
+        <div>
+            <span class="detailHeaders">First Name: </span>
+            <span class="details" id="firstNameDetails"></span>
+        </div>
+        <div>
+            <span class="detailHeaders">Last Name: </span>
+            <span id="lastNameDetails"></span>
+        </div>
+        <div>
+            <span class="detailHeaders">Email: </span>
+            <span id="emailDetails"></span>
+        </div>
+        <div>
+            <span class="detailHeaders">Password: </span>
+            <span id="passwordDetails"></span>
+        </div>
     </div>
+
+    <div id="bookingDiv">
+        <h3>Bookings</h3>
+        <div id="bookingDetails"></div>
+    </div>
+
+
 
 </div>
 </body>

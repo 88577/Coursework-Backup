@@ -8,11 +8,12 @@ h1 {
     margin-top:0;
 }
 
-table, th, td{
+
+
+.mySchedule{
     border: 1px solid black;
     border-collapse: collapse;
     text-align: center;
-
 }
 
 #content {
@@ -64,6 +65,13 @@ table, th, td{
 .editButton {
     visibility: hidden;
     background-color: silver;
+}
+
+#accountDIV{
+    font-size: 30px;
+}
+.detailHeaders{
+    font-weight: bold;
 }
 
 

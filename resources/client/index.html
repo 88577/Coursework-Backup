@@ -12,13 +12,16 @@
 <body onload="pageLoad()">
     <div id="content">
         <div id="pageHeader">
-            <div id="loggedInDetails"></div>
+            <div id="loggedInDetails">
+            </div>
+
             <h1>Bookings</h1>
 
         </div>
 
-
+        <h2>Schedule</h2>
         <div id="tableDiv">
+
         </div>
         <div id="bookingDiv">
             <h2 id="bookingHeading">Booking</h2>
@@ -30,15 +33,11 @@
                 <span class="bookingDetails">Time: </span>
                 <span id="time"></span>
             </div>
-            <div>
-                <form id="bookingForm">
-                    <input type="hidden" name="bookingID" id="bookingID">
-                    <input type="hidden" name="bookingDay" id="bookingDay">
-                    <input type="hidden" name="bookingTime" id="bookingTime">
-                </form>
-            </div>
 
             <input type="button" value="Book" id="bookButton">
+        </div>
+        <div>
+
         </div>
     </div>
 </body>
