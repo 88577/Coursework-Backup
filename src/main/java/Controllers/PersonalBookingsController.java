@@ -38,18 +38,22 @@ public class PersonalBookingsController {
     @GET
     @Path("ListAllUserBookings/{userID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String ListAllUserBookings(@PathParam("userID") Integer userID) throws Exception{
+    public String ListAllUserBookings(@PathParam("userID") Integer userID) throws Exception{
         if(userID == null){
             throw new Exception("User ID is missing from HTTP request");
         }
         System.out.println("PersonalBookingsController/ListAllUserBookings" + userID);
-        JSONArray list = new JSONArray();
+
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT bookingID FROM personalBookings WHERE userID = ?");
+            JSONArray list = new JSONArray();
+            PreparedStatement ps = Main.db.prepareStatement("SELECT personalBookings.bookingID, Bookings.description FROM personalBookings LEFT JOIN Bookings ON personalBookings.bookingID = Bookings.bookingID WHERE userID = ?");
             ps.setInt(1, userID);
             ResultSet results = ps.executeQuery();
             while (results.next()){
-                list.add(results.getInt(1));
+                JSONObject item = new JSONObject();
+                item.put("bookingID", results.getInt(1));
+                item.put("description", results.getString(2));
+                list.add(item);
             }
             return list.toString();
         }catch (Exception e){

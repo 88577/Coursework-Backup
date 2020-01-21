@@ -1,7 +1,15 @@
 function pageLoad() {
     let name = Cookies.get("firstName");
-    let id = Cookies.get("userID");
-    document.getElementById("header").innerHTML = name ;
+    const id = Cookies.get("userID");
+    document.getElementById("header").innerHTML = name;
+
+
+
+    let myBookings = '<table>' +
+        '<tr>' +
+        '<th>Booking</th>' +
+        '<th>Remove Booking</th>' +
+        '</tr>';
 
 
     fetch('/UserController/ListUser/' + id, {method:'get'}
@@ -9,40 +17,56 @@ function pageLoad() {
     ).then(userDetails => {
         let detailsArray = [userDetails.firstName, userDetails.lastName, userDetails.password, userDetails.email];
 
+
         document.getElementById("firstNameDetails").innerHTML=detailsArray[0];
         document.getElementById("lastNameDetails").innerHTML=detailsArray[1];
         document.getElementById("emailDetails").innerHTML=detailsArray[3];
         document.getElementById("passwordDetails").innerHTML=detailsArray[2];
 
     });
-    let myBookings = '<table>'
-        + '<tr>'
-        + '<th>Booking</th>'
-        + '<th>Timing</th>'
-        + '</tr>';
-    fetch('PersonalBookingsController/ListAllUserBookings/' + id, {method: 'get'}
-    ).then(response => response.json()
-    ).then(bookings => {
-       for(let booking of bookings){
-           console.log(booking.bookingID);
-           fetch('BookingsController/ListBookings/' + booking.bookingID, {method: 'get'}
-           ).then(response => response.json()
-           ).then(bookingDetails => {
-               let detailsArray = [bookingDetails.description];
-                   myBookings += '<tr>' +
-                       '<td>${detailsArray[0]}</td>' +
-                       '<td>beep</td>' +
-                       '</tr>';
+        fetch('/PersonalBookingsController/ListAllUserBookings/' + id, {method: 'get'}
+        ).then(response => response.json()
+        ).then(bookings => {
+           console.log("hallo");
+           for(let booking of bookings){
 
-           });
+               myBookings += `<tr>` +
+                   `<td>${booking.description}</td>` +
+                   `<td>` +
+                   `<button class="removeButton" booking-id="${booking.bookingID}">Remove Booking</button>` +
 
-       }
+                    `</td>` +
+                   `</tr>`;
 
-    });
-    myBookings += '</table>';
-    document.getElementById("bookingDetails").innerHTML = myBookings;
+           }
+            myBookings += '</table>';
+
+            let removeButtons = document.getElementsByClassName("removeButton");
+            for (let button of removeButtons) {
+                button.addEventListener("click", removeBooking);
+            }
+
+
+            document.getElementById("bookingDetails").innerHTML = myBookings;
+        });
+
+
 
     checkLogin();
+}
+
+function removeBooking(event){
+    const ok = confirm("Are you sure?");
+    if(ok === true){
+        let bookingID = event.target.getAttribute("booking-id");
+        let userID = Cookies.get("userID");
+
+        let formData = new FormData();
+        formData.append("userID", userID);
+        formData.append("bookingID", bookingID);
+
+
+    }
 }
 
 function checkLogin() {

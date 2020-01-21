@@ -19,20 +19,23 @@ public class BookingsController {
         @Consumes(MediaType.MULTIPART_FORM_DATA)
         @Produces(MediaType.APPLICATION_JSON)
         public static String InsertBookings(
-                @FormDataParam("bookingType") Integer bookingType,
-                @FormDataParam("description") String description,
-                @FormDataParam("slots") Integer slots){
+                @FormDataParam("bookingID") Integer bookingID){
             try{
-                if(bookingType == null || description == null || slots == null){
+                if(bookingID == null){
                     throw new Exception("One or more form data parameters are missing from the HTTP request");
                 }
 
-                System.out.println("InsertBookings");
+                System.out.println("BookingsController/InsertBookings " + bookingID);
 
-                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Bookings (bookingType, description, slots) VALUES (?, ?, ?)");
-                ps.setInt(1, bookingType);
-                ps.setString(2, description);
-                ps.setInt(3, slots);
+                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Bookings (bookingID, bookingType, description) VALUES (?, ?, ?)");
+
+                int bookingType = 3;
+                String description = "Freeplay";
+
+                ps.setInt(1, bookingID);
+                ps.setInt(2, bookingType);
+                ps.setString(3, description);
+
                 ps.executeUpdate();
                 return "{\"status\": \"OK\"}";
             }catch (Exception e){
@@ -117,13 +120,39 @@ public class BookingsController {
                     return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
                 }
         }
-        public static void DeleteBookings(int bookingID){
+        @POST
+        @Path("DeleteBookings")
+        @Consumes(MediaType.MULTIPART_FORM_DATA)
+        @Produces(MediaType.APPLICATION_JSON)
+        public String DeleteBookings(@FormDataParam("bookingID") Integer bookingID)throws Exception {
+            if (bookingID == null) {
+                throw new Exception("bookingID is missing from HTTP request");
+            }
+            System.out.println("BookingsController/DeleteBookings " + bookingID);
+
             try {
+
                 PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Bookings WHERE bookingID = ?");
                 ps.setInt(1, bookingID);
-                ps.executeUpdate();
-            }catch (Exception e){
+
+                PreparedStatement psPersonalBookings = Main.db.prepareStatement("DELETE FROM personalBookings WHERE bookingID = ?");
+                psPersonalBookings.setInt(1,bookingID);
+
+                PreparedStatement psCourt = Main.db.prepareStatement("DELETE FROM Courts WHERE bookingID = ?");
+                psCourt.setInt(1, bookingID);
+
+                PreparedStatement psSchedule = Main.db.prepareStatement("DELETE FROM Schedule WHERE bookingID = ?");
+                psSchedule.setInt(1, bookingID);
+
+                psPersonalBookings.execute();
+                psCourt.execute();
+                psSchedule.execute();
+
+                ps.execute();
+                return "{\"status\": \"OK\"}";
+            } catch (Exception e) {
                 System.out.println("Error" + e.getMessage());
+                return "{\"error\": \"Unable to delete item, please see server console for more info.\"}";
             }
         }
         public static void UpdateBookings(int bookingID, int bookingType, String description, int slots){

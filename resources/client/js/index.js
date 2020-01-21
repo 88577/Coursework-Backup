@@ -127,31 +127,76 @@ function book(event){
 }
 function bookNewBooking(event){
     const userID = Cookies.get("userID");
+    const day = event.target.getAttribute("day");
+    const time = event.target.getAttribute("time");
+    console.log(userID);
+    console.log(day);
+    console.log(time);
     // Gets logged in user's id
     fetch('/BookingsController/ListAllBookings', {method: 'get'}
     ).then(response => response.json()
     ).then(bookings => {
+        let i = 1;
         for(let booking of bookings){
-            let i = booking.bookingID + 1;
+            i = i + 1;
+        }
+        console.log(i);
+
+        let bookingID = i;
+        console.log("booking...");
+        bookNewBooking2(bookingID);
+
+        bookNewBooking3(bookingID, day, time);
+        console.log("New Booking");
+        console.log(userID + " " + bookingID);
+        document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
+        document.getElementById("bookButton").removeEventListener("click", bookBooking);
+    });
+    // Reset the event listeners for the button
+}
+
+function bookNewBooking2(bookingID){
+    console.log("booking part 2");
+    let bookingFormData = new FormData();
+    bookingFormData.append("bookingID", bookingID);
+    console.log(bookingID);
+    fetch('/BookingsController/InsertBookings', {method: 'post', body: bookingFormData}
+    ).then(response => response.json()
+    ).then(responseData => {
+
+        if (responseData.hasOwnProperty('error')) {
+            alert(responseData.error);
+        }
+    });
+}
+
+function bookNewBooking3(bookingID, day, time){
+    const id = Cookies.get("userID");
+
+    let bookingFormData = new FormData();
+    bookingFormData.append("userID", id);
+    bookingFormData.append("bookingID", bookingID);
+
+    fetch('/PersonalBookingsController/InsertUserBookings', {method: 'post', body: bookingFormData}
+    ).then(response => response.json()
+    ).then(responseData => {
+        if (responseData.hasOwnProperty('error')) {
+            alert(responseData.error);
         }
     });
 
-    let bookingID = "3";
-    console.log("booking...");
-    event.preventDefault();
-
-
     let formData = new FormData();
-    formData.append("bookingID","3");
+    formData.append("bookingID", bookingID);
     // Freeplay booking
-    formData.append("day", event.target.getAttribute("day"));
+    formData.append("day", day);
     // Set day of booking
-    formData.append("time", event.target.getAttribute("time"));
+    formData.append("time", time);
     // Set time of booking
 
     fetch('/ScheduleController/InsertBookingTiming', {method: 'post', body: formData}
     ).then(response => response.json()
     ).then(responseData => {
+        console.log("Hi");
         // Inserting into the Schedule Table
         if (responseData.hasOwnProperty('error')) {
             alert(responseData.error);
@@ -159,14 +204,8 @@ function bookNewBooking(event){
         pageLoad();
         // Update the page with the new booking
     });
-
-
-    console.log("New Booking");
-    console.log(userID + " " + bookingID);
-    document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
-    document.getElementById("bookButton").removeEventListener("click", bookBooking);
-    // Reset the event listeners for the button
 }
+
 
 function bookBooking() {
     let userID = Cookies.get("userID");
