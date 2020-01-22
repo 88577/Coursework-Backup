@@ -65,20 +65,51 @@ public class ScheduleController {
                 return "{\"error\": \"Unable to create new item, please see server console for more info.\"}";
             }
         }
-        public static void ListBookingTiming(int bookingID){
+        @GET
+        @Path("ListBookingTiming/{bookingID}")
+        @Produces(MediaType.APPLICATION_JSON)
+        public static String ListBookingTiming(@PathParam("bookingID") Integer bookingID){
             try {
+                System.out.println("ScheduleController/ListBookingTiming/ " + bookingID);
+
+                JSONArray list = new JSONArray();
+
                 PreparedStatement ps = Main.db.prepareStatement("SELECT day, time FROM Schedule WHERE bookingID = ?");
                 ps.setInt(1, bookingID);
                 ResultSet results = ps.executeQuery();
                 while(results.next()){
-                    String day = results.getString(1);
-                    int time = results.getInt(2);
-                    System.out.println(day + " " + time);
+                    JSONObject item = new JSONObject();
+                    item.put("day", results.getInt(1));
+                    item.put("time", results.getInt(2));
+                    list.add(item);
                 }
+                return list.toString();
             }catch (Exception e){
                 System.out.println("Error " + e.getMessage());
+                return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
             }
         }
+    @GET
+    @Path("ListFreeplayBookingTiming/{bookingID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String ListFreeplayBookingTiming(@PathParam("bookingID") Integer bookingID){
+        try {
+            System.out.println("ScheduleController/ListFreeplayBookingTiming/ " + bookingID);
+            JSONObject item = new JSONObject();
+
+            PreparedStatement ps = Main.db.prepareStatement("SELECT day, time FROM Schedule WHERE bookingID = ?");
+            ps.setInt(1, bookingID);
+            ResultSet results = ps.executeQuery();
+
+            item.put("day", results.getInt(1));
+            item.put("time", results.getInt(2));
+
+            return item.toString();
+        }catch (Exception e){
+            System.out.println("Error " + e.getMessage());
+            return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
+        }
+    }
 
         @GET
         @Path("ListDaysBookings/{day}")
@@ -147,4 +178,5 @@ public class ScheduleController {
             return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
         }
     }
+
 }

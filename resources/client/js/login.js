@@ -27,6 +27,7 @@ function login(event) {
             Cookies.set("token", responseData.token);
             Cookies.set("userID", responseData.userID);
             Cookies.set("firstName", responseData.firstName);
+            Cookies.set("password", responseData.password);
 
             window.location.href = '/client/index.html';
         }

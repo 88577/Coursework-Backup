@@ -214,6 +214,19 @@ function bookBooking() {
     // Gets the bookingID
     console.log("Existing Booking");
     console.log(userID + " " + bookingID);
+
+    let formData = new FormData();
+    formData.append("userID", userID);
+    formData.append("bookingID", bookingID);
+
+    fetch('/PersonalBookingsController/InsertUserBookings', {method: 'post', body: formData}
+    ).then(response => response.json()
+    ).then(responseData =>{
+        if (responseData.hasOwnProperty('error')) {
+            alert(responseData.error);
+        }
+    });
+
     document.getElementById("bookButton").removeEventListener("click", bookBooking);
     document.getElementById("bookButton").removeEventListener("click", bookNewBooking);
 

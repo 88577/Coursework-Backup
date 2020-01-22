@@ -46,13 +46,14 @@ public class PersonalBookingsController {
 
         try {
             JSONArray list = new JSONArray();
-            PreparedStatement ps = Main.db.prepareStatement("SELECT personalBookings.bookingID, Bookings.description FROM personalBookings LEFT JOIN Bookings ON personalBookings.bookingID = Bookings.bookingID WHERE userID = ?");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT personalBookings.bookingID, Bookings.description, Bookings.bookingType FROM personalBookings LEFT JOIN Bookings ON personalBookings.bookingID = Bookings.bookingID WHERE userID = ?");
             ps.setInt(1, userID);
             ResultSet results = ps.executeQuery();
             while (results.next()){
                 JSONObject item = new JSONObject();
                 item.put("bookingID", results.getInt(1));
                 item.put("description", results.getString(2));
+                item.put("bookingType", results.getInt(3));
                 list.add(item);
             }
             return list.toString();
@@ -101,6 +102,7 @@ public class PersonalBookingsController {
     }
 
 
+
     public static void DeleteAllUsersBooking(int userID){
         try {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM personalBookings WHERE userID = ?");
@@ -123,6 +125,38 @@ public class PersonalBookingsController {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("PersonalBookingsController/DeleteUsersBooking userID=" + userID);
+
+            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM personalBookings WHERE userID = ? and bookingID = ?");
+            ps.setInt(1, userID);
+            ps.setInt(2, bookingID);
+            ps.executeUpdate();
+
+            PreparedStatement ps2 = Main.db.prepareStatement("DELETE FROM Schedule WHERE bookingID = ?");
+            ps2.setInt(1, bookingID);
+            ps2.executeUpdate();
+
+            PreparedStatement ps3 = Main.db.prepareStatement("DELETE FROM Bookings WHERE bookingID = ?");
+            ps3.setInt(1, bookingID);
+            ps3.executeUpdate();
+
+            return "{\"status\": \"OK\"}";
+        }catch (Exception e){
+            System.out.println("Error " + e.getMessage());
+            return "{\"error\": \"Unable to delete item, please see server console for more info.\"}";
+        }
+    }
+    @POST
+    @Path("DeleteUsersExistingBooking")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String DeleteUsersExistingBooking(
+            @FormDataParam("userID") Integer userID,
+            @FormDataParam("bookingID") Integer bookingID){
+        try {
+            if(userID == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            System.out.println("PersonalBookingsController/DeleteUsersExistingBooking userID=" + userID);
 
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM personalBookings WHERE userID = ? and bookingID = ?");
             ps.setInt(1, userID);

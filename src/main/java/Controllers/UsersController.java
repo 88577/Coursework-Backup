@@ -154,6 +154,45 @@ public class UsersController{
             }
         }
 
+    @POST
+    // Inserting data
+    @Path("InsertNewUser")
+    // Defines the API path for method
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String InsertNewUser(
+            // Inserts a new user into the database
+            @FormDataParam("firstName") String firstName,
+            @FormDataParam("lastName") String lastName,
+            @FormDataParam("password") String password,
+            @FormDataParam("email") String email)
+    // Retrieves all form data inputted by user
+    {
+
+        try{
+            if(firstName == null || lastName == null || password == null || email == null){
+                // Check that no value is null
+                throw new Exception("One or more form data parameters are missing from the HTTP request");
+            }
+            System.out.println("InsertUser");
+            // Output to console to monitor API call
+
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Users (firstName, lastName, password, email, admin) values (?, ?, ?, ?, ?)");
+
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setString(3, password);
+            ps.setString(4, email);
+            ps.setInt(5, 0);
+            ps.execute();
+            return "{\"status\": \"OK\"}";
+
+        }   catch (Exception exception){
+            System.out.println("Database error: " + exception.getMessage());
+            return "{\"error\": \"Unable to create new item, please see server console for more info.\"}";
+        }
+    }
+
         @GET
         // Retrieving data
         @Path("ListAllUsers")
@@ -302,6 +341,61 @@ public class UsersController{
                 return "{\"error\": \"Unable to update item, please see server console for more info\"}";
             }
         }
+    @POST
+    @Path("UpdateUserEmail")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String UpdateUserEmail(
+            @FormDataParam("userID") Integer userID,
+            @FormDataParam("email") String email){
+
+        try {
+            if(userID == null || email == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+
+            System.out.println("UserController/UpdateUser userID=" + userID + " User Email=" + email);
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Users SET email = ? WHERE userID = ?");
+
+            ps.setString(1, email);
+            ps.setInt(2, userID);
+
+            ps.execute();
+            return "{\"status\": \"OK\"}";
+
+        }catch (Exception e){
+            System.out.println("Database error: " + e.getMessage());
+            return "{\"error\": \"Unable to update item, please see server console for more info\"}";
+        }
+    }
+
+    @POST
+    @Path("UpdateUserPassword")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String UpdateUserPassword(
+            @FormDataParam("userID") Integer userID,
+            @FormDataParam("password") String password){
+
+        try {
+            if(userID == null || password == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+
+            System.out.println("UserController/UpdateUser userID=" + userID + " User Email=" + password);
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Users SET password = ? WHERE userID = ?");
+
+            ps.setString(1, password);
+            ps.setInt(2, userID);
+
+            ps.execute();
+            return "{\"status\": \"OK\"}";
+
+        }catch (Exception e){
+            System.out.println("Database error: " + e.getMessage());
+            return "{\"error\": \"Unable to update item, please see server console for more info\"}";
+        }
+    }
 
 }
 

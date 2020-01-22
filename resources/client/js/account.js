@@ -8,9 +8,124 @@ function pageLoad() {
     let myBookings = '<table>' +
         '<tr>' +
         '<th>Booking</th>' +
+        '<th>Timing</th>' +
         '<th>Remove Booking</th>' +
         '</tr>';
 
+        listUsers();
+
+        fetch('/PersonalBookingsController/ListAllUserBookings/' + id, {method: 'get'}
+        ).then(response => response.json()
+        ).then(bookings => {
+
+           for(let booking of bookings){
+
+               myBookings += `<tr>` +
+                   `<td>${booking.description}</td>` +
+                   `<td id="${booking.bookingID}">${timing(booking.bookingID, booking.bookingType)}</td>` +
+                   `<td>` +
+                   `<button class='removeButton' booking-id="${booking.bookingID}" booking-type="${booking.bookingType}">Remove Booking</button>` +
+
+                    `</td>` +
+                   `</tr>`;
+
+
+           }
+            myBookings += '</table>';
+
+            document.getElementById("bookingDetails").innerHTML = myBookings;
+
+            addEventListeners();
+
+
+
+        });
+
+
+
+    checkLogin();
+}
+
+function timing(bookingID, bookingType){
+    if(bookingType == 3){
+        fetch('/ScheduleController/ListFreeplayBookingTiming/' + bookingID, {method: "get"}
+        ).then(response => response.json()
+        ).then(timing => {
+
+
+            if (timing.day == 1){
+                document.getElementById(bookingID).innerHTML = "Monday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
+
+            }else if (timing.day == 2){
+                document.getElementById(bookingID).innerHTML = "Tuesday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
+
+            }else if (timing.day == 3){
+                document.getElementById(bookingID).innerHTML = "Wednesday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
+
+
+            }else if (timing.day == 4){
+                document.getElementById(bookingID).innerHTML = "Thursday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
+
+            }else if (timing.day == 5){
+                document.getElementById(bookingID).innerHTML = "Friday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
+
+            }else{
+                document.getElementById(bookingID).innerHTML = "Saturday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
+
+            }
+        });
+    }
+    else{
+        let max = 0;
+        let min = 19;
+        fetch('/ScheduleController/ListBookingTiming/' + bookingID, {method: "get"}
+        ).then(response => response.json()
+        ).then(timings => {
+            console.log(timings);
+            for(let timing of timings){
+                if(max < timing.time){
+                    max = timing.time;
+                }
+                if (min > timing.time){
+                    min = timing.time;
+                }
+
+                if (timing.day == 1){
+                    document.getElementById(bookingID).innerHTML = "Monday, " + min + ":00 - " + max +":00";
+
+                }else if (timing.day == 2){
+                    document.getElementById(bookingID).innerHTML = "Tuesday, " + min + ":00 - " + max +":00";
+
+                }else if (timing.day == 3){
+                    document.getElementById(bookingID).innerHTML = "Wednesday, " + min + ":00 - " + max +":00";
+
+
+                }else if (timing.day == 4){
+                    document.getElementById(bookingID).innerHTML = "Thursday, " + min + ":00 - " + max +":00";
+
+                }else if (timing.day == 5){
+                    document.getElementById(bookingID).innerHTML = "Friday, " + min + ":00 - " + max +":00";
+
+                }else{
+                    document.getElementById(bookingID).innerHTML = "Saturday, " + min + ":00 - " + max +":00";
+
+                }
+            }
+        });
+    }
+}
+
+function addEventListeners() {
+
+    let removeButton = document.getElementsByClassName("removeButton");
+    for(let button of removeButton) {
+        button.addEventListener("click", removeBooking);
+    }
+}
+
+function listUsers(){
+
+    let id = Cookies.get("userID");
 
     fetch('/UserController/ListUser/' + id, {method:'get'}
     ).then(response => response.json()
@@ -22,49 +137,43 @@ function pageLoad() {
         document.getElementById("lastNameDetails").innerHTML=detailsArray[1];
         document.getElementById("emailDetails").innerHTML=detailsArray[3];
         document.getElementById("passwordDetails").innerHTML=detailsArray[2];
+        document.getElementById("resetEmail").innerHTML="<a href='newEmail.html'>Change Email</a>";
+        document.getElementById("resetPassword").innerHTML="<a href='newPassword.html'>Change Password</a>";
 
     });
-        fetch('/PersonalBookingsController/ListAllUserBookings/' + id, {method: 'get'}
-        ).then(response => response.json()
-        ).then(bookings => {
-           console.log("hallo");
-           for(let booking of bookings){
-
-               myBookings += `<tr>` +
-                   `<td>${booking.description}</td>` +
-                   `<td>` +
-                   `<button class="removeButton" booking-id="${booking.bookingID}">Remove Booking</button>` +
-
-                    `</td>` +
-                   `</tr>`;
-
-           }
-            myBookings += '</table>';
-
-            let removeButtons = document.getElementsByClassName("removeButton");
-            for (let button of removeButtons) {
-                button.addEventListener("click", removeBooking);
-            }
-
-
-            document.getElementById("bookingDetails").innerHTML = myBookings;
-        });
-
-
-
-    checkLogin();
 }
 
 function removeBooking(event){
-    const ok = confirm("Are you sure?");
-    if(ok === true){
-        let bookingID = event.target.getAttribute("booking-id");
-        let userID = Cookies.get("userID");
 
+    let ok = confirm("Are you sure?");
+    if(ok === true){
+        console.log(event.target.getAttribute("booking-type"));
+        let bookingID = event.target.getAttribute("booking-id");
+        let bookingType = event.target.getAttribute("booking-type");
+        let userID = Cookies.get("userID");
         let formData = new FormData();
         formData.append("userID", userID);
         formData.append("bookingID", bookingID);
 
+        if(bookingType == 3){
+            console.log("deleting");
+            fetch('/PersonalBookingsController/DeleteUsersBooking', {method: 'post', body: formData}
+            ).then(response => response.json()
+            ).then(responseData => {
+                if (responseData.hasOwnProperty('error')) {
+                    alert(responseData.error);
+                }
+            });
+        }else{
+            fetch('/PersonalBookingsController/DeleteUsersExistingBooking', {method: 'post', body: formData}
+            ).then(response => response.json()
+            ).then(responseData => {
+                if (responseData.hasOwnProperty('error')) {
+                    alert(responseData.error);
+                }
+            });
+        }
+        pageLoad();
 
     }
 }
