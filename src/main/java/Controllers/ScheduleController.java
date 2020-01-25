@@ -96,18 +96,21 @@ public class ScheduleController {
         try {
             System.out.println("ScheduleController/ListFreeplayBookingTiming/ " + bookingID);
             JSONObject item = new JSONObject();
-
+            // Create a new object named item
             PreparedStatement ps = Main.db.prepareStatement("SELECT day, time FROM Schedule WHERE bookingID = ?");
             ps.setInt(1, bookingID);
             ResultSet results = ps.executeQuery();
+            // Gets the day and time of a booking
 
             item.put("day", results.getInt(1));
             item.put("time", results.getInt(2));
-
+            // Puts the retrieved information in the item object
             return item.toString();
+            // Returns the item object
         }catch (Exception e){
             System.out.println("Error " + e.getMessage());
             return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
+            // Error checking
         }
     }
 

@@ -130,14 +130,17 @@ public class PersonalBookingsController {
             ps.setInt(1, userID);
             ps.setInt(2, bookingID);
             ps.executeUpdate();
+            // Deletes the booking from the personalBookings table
 
             PreparedStatement ps2 = Main.db.prepareStatement("DELETE FROM Schedule WHERE bookingID = ?");
             ps2.setInt(1, bookingID);
             ps2.executeUpdate();
+            // Deletes the booking from the Schedule table
 
             PreparedStatement ps3 = Main.db.prepareStatement("DELETE FROM Bookings WHERE bookingID = ?");
             ps3.setInt(1, bookingID);
             ps3.executeUpdate();
+            // Deletes the booking from the Bookings table
 
             return "{\"status\": \"OK\"}";
         }catch (Exception e){

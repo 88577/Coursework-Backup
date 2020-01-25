@@ -138,14 +138,12 @@ public class BookingsController {
                 PreparedStatement psPersonalBookings = Main.db.prepareStatement("DELETE FROM personalBookings WHERE bookingID = ?");
                 psPersonalBookings.setInt(1,bookingID);
 
-                PreparedStatement psCourt = Main.db.prepareStatement("DELETE FROM Courts WHERE bookingID = ?");
-                psCourt.setInt(1, bookingID);
+
 
                 PreparedStatement psSchedule = Main.db.prepareStatement("DELETE FROM Schedule WHERE bookingID = ?");
                 psSchedule.setInt(1, bookingID);
 
                 psPersonalBookings.execute();
-                psCourt.execute();
                 psSchedule.execute();
 
                 ps.execute();

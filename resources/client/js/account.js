@@ -11,15 +11,16 @@ function pageLoad() {
         '<th>Timing</th>' +
         '<th>Remove Booking</th>' +
         '</tr>';
+    // Creates a table for the bookings
 
         listUsers();
-
+        // Populates the UserDetails part of the account page
         fetch('/PersonalBookingsController/ListAllUserBookings/' + id, {method: 'get'}
         ).then(response => response.json()
         ).then(bookings => {
-
+            // Gets all the bookings for the logged in user
            for(let booking of bookings){
-
+                // Loops through the bookings retrieved
                myBookings += `<tr>` +
                    `<td>${booking.description}</td>` +
                    `<td id="${booking.bookingID}">${timing(booking.bookingID, booking.bookingType)}</td>` +
@@ -28,13 +29,13 @@ function pageLoad() {
 
                     `</td>` +
                    `</tr>`;
-
+                // Populates the table with the collected information
 
            }
             myBookings += '</table>';
 
             document.getElementById("bookingDetails").innerHTML = myBookings;
-
+            // Populates the Div in the HTML file with the table
             addEventListeners();
 
 
@@ -48,14 +49,15 @@ function pageLoad() {
 
 function timing(bookingID, bookingType){
     if(bookingType == 3){
+        // If it is a freeplay booking
         fetch('/ScheduleController/ListFreeplayBookingTiming/' + bookingID, {method: "get"}
         ).then(response => response.json()
         ).then(timing => {
-
+        // Retrieves the day and time of the booking
 
             if (timing.day == 1){
                 document.getElementById(bookingID).innerHTML = "Monday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
-
+                // Sets the innerHTML of the section of the table to the day and the time
             }else if (timing.day == 2){
                 document.getElementById(bookingID).innerHTML = "Tuesday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
 
@@ -73,14 +75,18 @@ function timing(bookingID, bookingType){
                 document.getElementById(bookingID).innerHTML = "Saturday, " + timing.time + ":00 - " + (timing.time + 1) +":00";
 
             }
+            // If statements depending on which day of the week
         });
     }
     else{
+        // If it is not a freeplay booking (lasts longer than one hour)
         let max = 0;
         let min = 19;
+        // Set a min and a max
         fetch('/ScheduleController/ListBookingTiming/' + bookingID, {method: "get"}
         ).then(response => response.json()
         ).then(timings => {
+            // Gets the day and time of a booking
             console.log(timings);
             for(let timing of timings){
                 if(max < timing.time){
@@ -89,10 +95,11 @@ function timing(bookingID, bookingType){
                 if (min > timing.time){
                     min = timing.time;
                 }
+                // Finds the start and end times
 
                 if (timing.day == 1){
                     document.getElementById(bookingID).innerHTML = "Monday, " + min + ":00 - " + max +":00";
-
+                    // Sets the innerHTML of the section of the table to the day and the time
                 }else if (timing.day == 2){
                     document.getElementById(bookingID).innerHTML = "Tuesday, " + min + ":00 - " + max +":00";
 
@@ -110,6 +117,7 @@ function timing(bookingID, bookingType){
                     document.getElementById(bookingID).innerHTML = "Saturday, " + min + ":00 - " + max +":00";
 
                 }
+                // If statements depending on which day of the week
             }
         });
     }
@@ -118,8 +126,10 @@ function timing(bookingID, bookingType){
 function addEventListeners() {
 
     let removeButton = document.getElementsByClassName("removeButton");
+    // Gets each button
     for(let button of removeButton) {
         button.addEventListener("click", removeBooking);
+        // Calls the removeBooking function on click
     }
 }
 
@@ -146,16 +156,21 @@ function listUsers(){
 function removeBooking(event){
 
     let ok = confirm("Are you sure?");
+    // An alert pops up with a yes or no option
     if(ok === true){
+        // If they select yes
         console.log(event.target.getAttribute("booking-type"));
         let bookingID = event.target.getAttribute("booking-id");
         let bookingType = event.target.getAttribute("booking-type");
         let userID = Cookies.get("userID");
+        // Gets all of the booking/user data
         let formData = new FormData();
         formData.append("userID", userID);
         formData.append("bookingID", bookingID);
+        // Creates and appends the information to the formData list
 
         if(bookingType == 3){
+            // If it is a freeplay booking (can delete the whole booking)
             console.log("deleting");
             fetch('/PersonalBookingsController/DeleteUsersBooking', {method: 'post', body: formData}
             ).then(response => response.json()
@@ -165,6 +180,7 @@ function removeBooking(event){
                 }
             });
         }else{
+            // If it is not a freeplay booking (can delete the user's connection with the booking, but not the booking itself)
             fetch('/PersonalBookingsController/DeleteUsersExistingBooking', {method: 'post', body: formData}
             ).then(response => response.json()
             ).then(responseData => {
@@ -174,7 +190,7 @@ function removeBooking(event){
             });
         }
         pageLoad();
-
+        // Refreshes the page
     }
 }
 
